@@ -390,11 +390,10 @@ class RandomGenerator_s(object):
         x, y = image.shape
         image = zoom(image, (self.output_size[0] / x, self.output_size[1] / y), order=0)
         label = zoom(label, (self.output_size[0] / x, self.output_size[1] / y), order=0)
+        image = rand_gray(image).type("torch.FloatTensor")
         image = color_jitter(image).type("torch.FloatTensor")
         image = rand_affine(image).type("torch.FloatTensor")
         image = gaussian_blur(image).type("torch.FloatTensor")
-        image = rand_gray(image).type("torch.FloatTensor")
-#         grid_mask = Grid_Mask()
 #         image = grid_mask(image).type("torch.FloatTensor")
 #         image = torch.from_numpy(image.astype(np.float32)).unsqueeze(0)
         label = torch.from_numpy(label.astype(np.uint8))

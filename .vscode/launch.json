@@ -1,0 +1,39 @@
+{
+    // 使用 IntelliSense 了解相关属性。 
+    // 悬停以查看现有属性的描述。
+    // 欲了解更多信息，请访问: https://go.microsoft.com/fwlink/?linkid=830387
+    /*"""python train_Contrastive_Cross_CNN_ViT_2D.py
+    --root_path /media/icml/H4T/DATASET/ACDC 
+    --exp ACDC/train_Contrastive_Cross_CNN_ViT_2D_test
+    --model unet 
+    -max_iterations 30,000 
+    -batch_size 24 
+    --base_lr 0.01 
+    --num_classes 4 
+    --labeled_num 7
+    python train_Contrastive_Cross_CNN_ViT_2D.py --root_path /media/icml/H4T/DATASET/ACDC --exp ACDC/train_Contrastive_Cross_CNN_ViT_2D_test --batch_size 12  --labeled_bs 6 --num_classes 4  --labeled_num 7
+    """
+
+
+    */
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Contrastive_Cross_CNN_ViT_2D",
+            "type": "debugpy",
+            "request": "launch",
+            "cwd": "${workspaceFolder}/code/",
+            "program": "${workspaceFolder}/code/train_Contrastive_Cross_CNN_ViT_2D.py",
+            "console": "integratedTerminal",
+            "args": [
+                "--root_path","/media/icml/H4T/DATASET/ACDC",
+                "--exp","ACDC/train_Contrastive_Cross_CNN_ViT_2D_test",
+                "--num_classes","4",
+                "--labeled_num","7",
+                "--batch_size","12",
+                "--labeled_bs","6"
+            ],
+            "justMyCode": false
+        }
+    ]
+}

@@ -138,7 +138,7 @@ def train(args, snapshot_path):
     model2 = ViT_seg(config, img_size=args.patch_size,
                      num_classes=args.num_classes).cuda()
     model2.load_from(config)
-    
+
     classifier_1 = create_model('classifier')
     classifier_2 = create_model('classifier')
     projector_1 = create_model('projector')
@@ -412,6 +412,16 @@ def train(args, snapshot_path):
 
 
 if __name__ == "__main__":
+    """python train_Contrastive_Cross_CNN_ViT_2D.py
+    --root_path /media/icml/H4T/DATASET/ACDC 
+    --exp ACDC/train_Contrastive_Cross_CNN_ViT_2D_test
+    --model unet 
+    -max_iterations 30,000 
+    -batch_size 24 
+    --base_lr 0.01 
+    --num_classes 4 
+    --labeled_num 7
+    """
     if not args.deterministic:
         cudnn.benchmark = True
         cudnn.deterministic = False
