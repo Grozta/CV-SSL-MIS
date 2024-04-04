@@ -6,7 +6,7 @@ import shutil
 import sys
 import time
 from datetime import datetime
-from info_nce import *
+#from info_nce import *
 from collections import Counter
 
 import numpy as np
@@ -350,7 +350,7 @@ def train(args, snapshot_path):
     dice_loss = losses.DiceLoss(num_classes)
     pixel_wise_contrastive_loss_criter = ConLoss()
     contrastive_loss_sup_criter = contrastive_loss_sup()
-    infoNCE_loss = InfoNCE()
+    #infoNCE_loss = InfoNCE()
 
     writer = SummaryWriter(snapshot_path + '/log')
     logging.info("{} iterations per epoch".format(len(trainloader)))
