@@ -60,7 +60,7 @@ parser.add_argument('--root_path', type=str,
 parser.add_argument('--exp', type=str,
                     default='ACDC/Cross_teaching_min_max', help='experiment_name')
 parser.add_argument('--model', type=str,
-                    default='unet', help='model_name')
+                    default='ViT2D', help='model_name')
 parser.add_argument('--max_iterations', type=int,
                     default=30000, help='maximum iteration number to train')
 parser.add_argument('--batch_size', type=int, default=24,
@@ -243,7 +243,7 @@ def train(args, snapshot_path):
 #         logging.info(f"\nWeak Policy: {max(Counter([a.f for a in db_train.ops_weak]).values())}")
         logging.info(f"Strong Policy: {db_train.ops_strong}")
 
-    cta = augmentations.aug.CTAugment()
+    cta = augmentations.CTAugment()
     transform = CTATransform(args.patch_size, cta)
 
     # sample initial weak and strong augmentation policies (CTAugment)
@@ -612,10 +612,10 @@ def train(args, snapshot_path):
                         save_best = os.path.join(snapshot_path,
                                                  '{}_best_model1.pth'.format(args.model))
 
-#                         util.save_checkpoint(epoch_num, model1, optimizer1, loss, save_mode_path)
-#                         util.save_checkpoint(epoch_num, model1, optimizer1, loss, save_best)
-                        util.save_checkpoint(epoch_num, model1, optimizer1, projector_1, projector_3, cta, best_performance1, save_mode_path)
-                        util.save_checkpoint(epoch_num, model1, optimizer1, projector_1, projector_3, cta, best_performance1, save_best)
+                        util.save_checkpoint(epoch_num, model1, optimizer1, loss, save_mode_path)
+                        util.save_checkpoint(epoch_num, model1, optimizer1, loss, save_best)
+#                        util.save_checkpoint(epoch_num, model1, optimizer1, projector_1, projector_3, cta, best_performance1, save_mode_path)
+#                        util.save_checkpoint(epoch_num, model1, optimizer1, projector_1, projector_3, cta, best_performance1, save_best)
 
                 logging.info(
                     'iteration %d : model1_mean_dice : %f model1_mean_hd95 : %f' % (iter_num, performance1, mean_hd951))
@@ -651,10 +651,10 @@ def train(args, snapshot_path):
                         save_best = os.path.join(snapshot_path,
                                                  '{}_best_model2.pth'.format(args.model))
 
-#                         util.save_checkpoint(epoch_num, model2, optimizer2, loss, save_mode_path)
-#                         util.save_checkpoint(epoch_num, model2, optimizer2, loss, save_best)
-                        util.save_checkpoint(epoch_num, model2, optimizer2, projector_2, projector_4, cta, best_performance2, save_mode_path)
-                        util.save_checkpoint(epoch_num, model2, optimizer2, projector_2, projector_4, cta, best_performance2, save_best)
+                        util.save_checkpoint(epoch_num, model2, optimizer2, loss, save_mode_path)
+                        util.save_checkpoint(epoch_num, model2, optimizer2, loss, save_best)
+                        # util.save_checkpoint(epoch_num, model2, optimizer2, projector_2, projector_4, cta, best_performance2, save_mode_path)
+                        # util.save_checkpoint(epoch_num, model2, optimizer2, projector_2, projector_4, cta, best_performance2, save_best)
 
                 logging.info(
                     'iteration %d : model2_mean_dice : %f model2_mean_hd95 : %f' % (iter_num, performance2, mean_hd952))
@@ -666,15 +666,15 @@ def train(args, snapshot_path):
                 save_mode_path = os.path.join(
                     snapshot_path, 'model1_iter_' + str(iter_num) + '.pth')
 
-#                 util.save_checkpoint(epoch_num, model1, optimizer1, loss, save_mode_path)
-                util.save_checkpoint(epoch_num, model1, optimizer1, projector_1, projector_3, cta, best_performance1, save_mode_path)
+                util.save_checkpoint(epoch_num, model1, optimizer1, loss, save_mode_path)
+                # util.save_checkpoint(epoch_num, model1, optimizer1, projector_1, projector_3, cta, best_performance1, save_mode_path)
                 logging.info("save model1 to {}".format(save_mode_path))
 
                 save_mode_path = os.path.join(
                     snapshot_path, 'model2_iter_' + str(iter_num) + '.pth')
 
-#                 util.save_checkpoint(epoch_num, model2, optimizer2, loss, save_mode_path)
-                util.save_checkpoint(epoch_num, model2, optimizer2, projector_2, projector_4, cta, best_performance2, save_mode_path)
+                util.save_checkpoint(epoch_num, model2, optimizer2, loss, save_mode_path)
+                #util.save_checkpoint(epoch_num, model2, optimizer2, projector_2, projector_4, cta, best_performance2, save_mode_path)
                 logging.info("save model2 to {}".format(save_mode_path))
 
             if iter_num >= max_iterations:

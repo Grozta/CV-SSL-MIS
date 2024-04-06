@@ -7,13 +7,16 @@ import numpy as np
 from glob import glob
 from torch.utils.data import Dataset
 import h5py
-from scipy.ndimage.interpolation import zoom
+from scipy.ndimage import zoom
 from torchvision import transforms
 import itertools
 from scipy import ndimage
 from torch.utils.data.sampler import Sampler
+import sys
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import augmentations
 from augmentations.ctaugment import OPS
+from torch.utils.data import DataLoader
 import matplotlib.pyplot as plt
 from PIL import Image
 import gridmask
@@ -73,6 +76,7 @@ class BaseDataSets(Dataset):
             else:
                 sample = self.transform(sample)
         sample["idx"] = idx
+        # print(sample['image'].shape, sample['label'].shape)
         return sample
 
 
@@ -172,11 +176,16 @@ class CTATransform(object):
         label_aug = to_tensor(label_aug).squeeze(0)
         label_aug = torch.round(255 * label_aug).int()
 
-        sample = {
-            "image_weak": to_tensor(image_weak),
-            "image_strong": to_tensor(image_strong),
-            "label_aug": label_aug,
-        }
+        # sample = {
+        #     "image_weak": to_tensor(image_weak),
+        #     "image_strong": to_tensor(image_strong),
+        #     "label_aug": label_aug,
+        # }
+        sample["image"] = image
+        sample["label"] = label
+        sample["image_weak"] = to_tensor(image_weak)
+        sample["image_strong"] = to_tensor(image_strong)
+        sample["label_aug"] = label_aug
         return sample
 
     def cta_apply(self, pil_img, ops):
@@ -188,6 +197,7 @@ class CTATransform(object):
 
     def resize(self, image):
         x, y = image.shape
+        # return cv2.resize(image, self.output_size[::-1])
         return zoom(image, (self.output_size[0] / x, self.output_size[1] / y), order=0)
 
 
@@ -422,3 +432,65 @@ class RandomGenerator(object):
         label = torch.from_numpy(label.astype(np.uint8))
         sample = {"image": image, "label": label}
         return sample
+
+def patients_to_slices(dataset, patiens_num): 
+    ref_dict = None
+    if "ACDC" in dataset:
+        ref_dict = {"3": 68, "7": 136,
+                    "14": 256, "21": 396, "28": 512, "35": 664, "130":1132,"126":1058, "140": 1312}
+    elif "Prostate":
+        ref_dict = {"2": 27, "4": 53, "8": 120,
+                    "12": 179, "16": 256, "21": 312, "42": 623}
+    else:
+        print("Error")
+    return ref_dict[str(patiens_num)]
+
+def train_collate(batch):
+    transposed_batch = list(zip(*batch))
+    images = torch.stack(transposed_batch[0], 0)
+    points = transposed_batch[1]  # the number of points is not fixed, keep it as a list of tensor
+    targets = transposed_batch[2]
+    st_sizes = torch.FloatTensor(transposed_batch[3])
+    return images, points, targets, st_sizes
+
+
+if __name__ == '__main__':
+    
+    cta = augmentations.CTAugment()
+    transform = CTATransform([224, 224], cta)
+
+    # sample initial weak and strong augmentation policies (CTAugment)
+    ops_weak = cta.policy(probe=False, weak=True)
+    ops_strong = cta.policy(probe=False, weak=False)
+    
+    db_train = BaseDataSets(
+        base_dir='/media/icml/H4T/DATASET/ACDC',
+        split="train",
+        num=None,
+        transform=transform,
+        ops_weak=ops_weak,
+        ops_strong=ops_strong,
+    )
+    
+    total_slices = len(db_train)
+    
+    
+    
+    labeled_slice = patients_to_slices('/media/icml/H4T/DATASET/ACDC', 7)
+    print("Total silices is: {}, labeled slices is: {}".format(
+        total_slices, labeled_slice))
+    labeled_idxs = list(range(0, labeled_slice))
+    unlabeled_idxs = list(range(labeled_slice, total_slices))
+    batch_sampler = TwoStreamBatchSampler(
+        labeled_idxs, unlabeled_idxs, 12, 6)
+    
+    trainloader = DataLoader(
+        db_train,
+        batch_sampler=batch_sampler,
+        pin_memory=True,
+        # num_workers=4,
+        # batch_size=2
+    )
+    
+    for i_batch, sampled_batch in enumerate(zip(trainloader)):
+        print(i_batch)
